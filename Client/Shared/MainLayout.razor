@@ -1,0 +1,60 @@
+﻿@inherits LayoutComponentBase
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+
+    <MudAppBar Elevation="1" Color="Color.Dark">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Title="Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudIconButton Href="/" Match="NavLinkMatch.All" Title="Home" Icon="@Icons.Material.Filled.House"></MudIconButton>
+        <MudIconButton Href="/showcars" Match="NavLinkMatch.Prefix" Title="Show cars" Icon="@Icons.Filled.DirectionsCar">Showcars</MudIconButton>
+        <AuthorizeView>
+            <Authorized>
+                <NJAuto.Client.Pages.Logout></NJAuto.Client.Pages.Logout>
+            </Authorized>
+            <NotAuthorized>
+                <MudIconButton Href="/Login" Match="NavLinkMatch.Prefix" Title="Login" Icon="@Icons.Filled.Login"></MudIconButton>
+            </NotAuthorized>
+        </AuthorizeView>
+        <MudIconButton Href="/about" Title="About os" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.HistoryEdu"></MudIconButton>
+         <AuthorizeView Roles="Admin">  
+        <MudIconButton Href="/Workers" Match="NavLinkMatch.Prefix" Title="Employees" Icon="@Icons.Filled.SupervisedUserCircle">Employees</MudIconButton>
+         </AuthorizeView>
+        <MudText> </MudText>
+        <MudSpacer />
+        <MudImage Style="height: 60px" Src="Images/Logo.PNG"></MudImage>
+
+    </MudAppBar>
+    <MudDrawer @bind-Open="@open" Color="Color.Dark" Breakpoint="@breakpoint" Elevation="1" Variant="@DrawerVariant.Responsive" PreserveOpenState="@preserveOpenState">
+        <MudDrawerHeader>
+            <MudImage Src="Images/Logo.PNG" Height="150" Width="200"></MudImage>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <NavMenu />
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+
+        <div class="main black-background">
+            @Body
+        </div>
+
+        <footer class="footer">
+            <NJAuto.Client.Pages.FooterDetails></NJAuto.Client.Pages.FooterDetails>
+        </footer>
+
+    </MudMainContent>
+
+</MudLayout>
+
+@code {
+    bool open = false;
+    bool preserveOpenState = false;
+    Breakpoint breakpoint = Breakpoint.Xl;
+
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+}

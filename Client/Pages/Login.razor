@@ -1,0 +1,75 @@
+﻿@page "/Login"
+@inject HttpClient Http;
+@inject AuthenticationStateProvider AuthStateProvider;
+@inject ILocalStorageService LocalStorage; 
+@inject NavigationManager NavigationManager;
+@inject IDialogService DialogService;
+                
+
+<div class="image">
+    <div class="container-fluid">
+        <div class="mudPaper">
+            <MudCard Label="Login" Style="background-color:transparent; padding-top:10px;">
+               <EditForm Model="_user" OnValidSubmit="LoginSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <MudTextField Class="input" T="string" Label="Username" Variant="Variant.Filled" @bind-Value="_user.Username" />
+                    <MudTextField Class="input" @bind-Value="_user.Password" Label="Password" Variant="Variant.Filled" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+                    <button Style="margin-left:400px; margin-top:20px;" type="submit" class="btn btn-light">Login</button>
+                </EditForm>
+            </MudCard>
+        </div>
+    </div>
+</div>
+@code {
+    private readonly LoginUser _user = new();
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+    private string? _errorMessage = null;
+
+   
+
+    private async Task LoginSubmit()
+    {
+        _errorMessage = null;
+
+        var response = await Http.PostAsJsonAsync<LoginUser>("/loginController", _user);
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        if (!response.IsSuccessStatusCode)
+        {
+            _errorMessage = await response.Content.ReadAsStringAsync();
+            DialogService.Show<DialogError>("User not found ", options);
+        }
+        else
+        {
+            var token = await response.Content.ReadAsStringAsync();
+            await LocalStorage.SetItemAsStringAsync("token", token);
+          await AuthStateProvider.GetAuthenticationStateAsync();
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+
+
+
+
+
+
+}

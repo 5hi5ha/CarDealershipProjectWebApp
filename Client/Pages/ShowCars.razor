@@ -1,0 +1,155 @@
+﻿@page "/Showcars"
+@page "/Showcars/{Brand}"
+@using static System.Net.Mime.MediaTypeNames
+@inherits MainLayout
+@inject HttpClient Http;
+@inject IDialogService DialogService
+@if (_cars is null)
+{
+    <div style="height:400px;">
+    <Spinner></Spinner>
+    </div>
+}
+else
+{
+    <div class="container-fluid p-1" >
+        <label class="col-1 col-sm-1" for="selectedBrands">Select Brand </label>
+        <select class="col-1 col-sm-1" id="selectedBrand" @bind="@Brand" @onclick="Clear">
+            <option value="" selected> All Brands </option>
+            @foreach (var brand in brands)
+            {
+                <option value="@brand">@brand</option>
+            }
+        </select>
+        <button class="btn btn-light  col-sm-1 offset-8 " @onclick="GetBrand"> Search</button>
+    </div>
+
+    <div class="container-fluid">
+        <CarDetails Car="_selectedCar" />
+        <UpdateCar Car="_update" />
+    
+        <div class="row">
+            @foreach (var car in _cars)
+            {
+                <div class="col" style=" flex: 0 0 auto; width: 19rem; padding-top: 20px; ">
+                    <CarCard Car="car" OnSelected="HandleCarSelected" DeleteCar="RemoveCar" EditCar="EditCarSelected" />
+                </div>
+            }
+            
+            <div class="col" style=" flex: 0 0 auto; width: 19rem; padding-top: 20px; ">
+                 <AuthorizeView> 
+                <AddCar></AddCar>
+             </AuthorizeView>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+    private IEnumerable<Car>? _cars;
+    private Car? _selectedCar;
+    private Car? _update;
+    private List<string>? brands = new();
+    private string? imageBase64;
+    [Parameter]
+    public string? Brand { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCars();
+        foreach (var car in _cars)
+        {
+            if (!brands.Contains(car.Brand))
+            {
+                brands.Add(car.Brand);
+
+            }
+        }
+        StateHasChanged();
+    }
+
+    private async Task GetCars()
+    {
+        _cars = await Http.GetFromJsonAsync<IEnumerable<Car>>("/carservice");
+        LoadImages();
+    }
+
+    private void HandleCarSelected(Car car)
+    {
+        _selectedCar = car;
+        if (_selectedCar != null)
+        {
+            _update = null;
+        }
+    }
+
+    private void EditCarSelected(Car car)
+    {
+        _update = car;
+        if (_update != null)
+        {
+            _selectedCar = null;
+        }
+    }
+    private async Task GetBrand()
+    {
+        if (!string.IsNullOrWhiteSpace(Brand))
+        {
+            Clear();
+            _cars = await Http.GetFromJsonAsync<IEnumerable<Car>>($"/carservice/{Brand}");
+            StateHasChanged();
+            LoadImages();
+        }
+        else
+        {
+            Clear();
+            await GetCars();
+        }
+    }
+
+    private async Task RemoveCar(Car car)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        if (car != null)
+        {
+            _update = null;
+            _selectedCar = null;
+            var result = await Http.DeleteAsync($"/carservice/{car.CarId}");
+            if (result.IsSuccessStatusCode)
+            {
+                DialogService.Show<DialogSucces>("Car is delete it", options);
+            }
+            if (!result.IsSuccessStatusCode)
+            {
+                DialogService.Show<DialogError>("Failed to delete car ", options);
+                StateHasChanged();
+            }
+        }
+        await GetBrand();
+        await GetCars();
+        StateHasChanged();
+    }
+
+    private void LoadImages()
+    {
+        foreach (var car in _cars)
+        {
+            const string format = "image/png";
+            imageBase64 = $"data:{format};base64,{Convert.ToBase64String(car.ImageData)}";
+            car.ImageTitle = imageBase64;
+        }
+    }
+    void Clear()
+    {
+        if (_selectedCar!=null)
+        {
+            _selectedCar=null;
+        }
+        if (_update != null)
+        {
+            _update = null;
+        }
+    }
+}

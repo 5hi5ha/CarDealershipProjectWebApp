@@ -1,0 +1,82 @@
+﻿.imgBack {
+    max-width: 100%;
+}
+.cont {
+    position: relative;
+width: 100%;
+max-width: 600px;
+   
+}
+
+.mapouter {
+    text-align: right;
+    height: 380px;
+    width: 500px;
+  
+}
+.gmap_canvas {
+    overflow: hidden;
+    background: none !important;
+    height: 380px;
+    width: 500px;
+   padding: 20px;
+}
+.borderF {
+    border-left-color: black;
+    border-left-width: 8px;
+   padding: 20px;
+    height: 410px;
+    width: 500px;
+    color:white;
+}
+
+ .text-left{
+     
+     font-family:'Baskerville Old Face';
+ }
+.box {
+    display: flex;
+    flex-direction: column;
+  justify-content: space-around;
+ 
+  
+}
+.box_item {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    border-width: 50px;
+    border-block-color: black;
+}
+.contact-form-top{
+    top:0;
+}
+
+.open-time {
+    width: 18rem;
+    background-color: #484848;
+    color: white;
+    height: 360px;
+   
+}
+.card-border {
+    border-left-color: black;
+    border-left-width: 8px;
+}
+
+.history-text {
+    color: white;
+    font-family: 'Baskerville Old Face';
+    font-size:20px;
+    line-height:40px;
+    padding-top:30px;
+}
+.padding-top{
+    padding-top:10vh;
+}
+
+
+      
+
+ 

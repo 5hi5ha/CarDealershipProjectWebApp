@@ -1,0 +1,10 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+    <MudNavLink Href="/showcars" Match="NavLinkMatch.Prefix">Showcars</MudNavLink>
+    <AuthorizeView>
+<NotAuthorized>
+    <MudNavLink Href="/Login" Match="NavLinkMatch.Prefix">Login</MudNavLink>
+</NotAuthorized>
+    </AuthorizeView>
+    <MudNavLink Href="/about"  Match="NavLinkMatch.Prefix">About</MudNavLink>
+</MudNavMenu>
